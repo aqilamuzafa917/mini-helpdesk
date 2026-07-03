@@ -36,7 +36,6 @@ class TicketObserver
      */
     public function created(Ticket $ticket): void
     {
-        // Write initial status history record (null -> open)
         TicketStatusHistory::create([
             'ticket_id' => $ticket->id,
             'old_status' => null,
@@ -50,49 +49,33 @@ class TicketObserver
     /**
      * Handle the Ticket "updating" event.
      *
-     * Only mutate model attributes here (resolved_at). Audit history is written
-     * in updated() so it only records changes that were actually persisted.
+     * isDirty() and getOriginal() are reliable here — use them to capture
+     * the status transition and write the audit record before the save commits.
      */
     public function updating(Ticket $ticket): void
     {
-        if ($ticket->isDirty('status')) {
-            $newStatus = $ticket->status;
-            $oldStatus = $ticket->getOriginal('status');
-
-            // Manage resolved_at timestamp
-            if ($newStatus === TicketStatus::Resolved) {
-                $ticket->resolved_at = now();
-            } elseif ($oldStatus === TicketStatus::Resolved) {
-                $ticket->resolved_at = null;
-            }
-
-            // Stash the pre-update status so updated() can reference it after
-            // the dirty state is cleared by Eloquent.
-            $ticket->previousStatus = $oldStatus;
+        if (! $ticket->isDirty('status')) {
+            return;
         }
-    }
 
-    /**
-     * Handle the Ticket "updated" event.
-     *
-     * Writing history here guarantees the database row was successfully updated
-     * before we create the audit record.
-     */
-    public function updated(Ticket $ticket): void
-    {
-        if (isset($ticket->previousStatus)) {
-            $oldStatus = $ticket->previousStatus;
+        /** @var TicketStatus $newStatus */
+        $newStatus = $ticket->status;
+        $oldStatus = $ticket->getOriginal('status');
 
-            TicketStatusHistory::create([
-                'ticket_id' => $ticket->id,
-                'old_status' => $oldStatus instanceof TicketStatus ? $oldStatus->value : $oldStatus,
-                'new_status' => $ticket->status->value,
-                'notes' => $ticket->status_change_notes ?? null,
-                'changed_by' => Auth::id(),
-                'changed_at' => now(),
-            ]);
-
-            unset($ticket->previousStatus);
+        // Manage resolved_at
+        if ($newStatus === TicketStatus::Resolved) {
+            $ticket->resolved_at = now();
+        } elseif ($oldStatus === TicketStatus::Resolved) {
+            $ticket->resolved_at = null;
         }
+
+        TicketStatusHistory::create([
+            'ticket_id' => $ticket->id,
+            'old_status' => $oldStatus instanceof TicketStatus ? $oldStatus->value : $oldStatus,
+            'new_status' => $newStatus->value,
+            'notes' => $ticket->status_change_notes ?? null,
+            'changed_by' => Auth::id(),
+            'changed_at' => now(),
+        ]);
     }
 }
