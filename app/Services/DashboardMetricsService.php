@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Priority;
 use App\Enums\TicketStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,7 +13,9 @@ class DashboardMetricsService
     /**
      * Create a new service instance.
      */
-    public function __construct(protected TicketQueryService $queryService) {}
+    public function __construct(protected TicketQueryService $queryService)
+    {
+    }
 
     /**
      * Get aggregate status counts for the given base query.
