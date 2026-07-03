@@ -3,6 +3,7 @@
 use App\Enums\Role;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\StoreTicketRequest;
+use App\Http\Requests\UpdateMonthlyReportRequest;
 use App\Http\Requests\UpdateTicketRequest;
 use App\Livewire\Clients\ClientForm;
 use App\Livewire\Clients\ClientTable;
@@ -68,7 +69,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Reports
     Route::get('/reports/monthly', MonthlyReport::class)->name('reports.monthly');
-    Route::get('/reports/monthly/print', function () {
+    Route::get('/reports/monthly/print', function (UpdateMonthlyReportRequest $request) {
         return view('reports.monthly-print');
     })->name('reports.monthly.print');
 });

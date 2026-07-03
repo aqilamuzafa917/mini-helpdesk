@@ -17,7 +17,36 @@ test('inactive user login is denied with generic error', function () {
         'password' => 'password123',
     ]);
 
-    $response->assertSessionHasErrors('email');
+    $response->assertSessionHasErrors([
+        'email' => __('auth.failed'),
+    ]);
+    $this->assertGuest();
+});
+
+test('invalid credentials (wrong password or non-existent email) return the same generic error', function () {
+    $user = User::factory()->create([
+        'email' => 'active@example.com',
+        'password' => bcrypt('password123'),
+    ]);
+
+    // 1. Existing user, wrong password
+    $response1 = $this->post(route('login.store'), [
+        'email' => 'active@example.com',
+        'password' => 'wrongpassword',
+    ]);
+    $response1->assertSessionHasErrors([
+        'email' => __('auth.failed'),
+    ]);
+    $this->assertGuest();
+
+    // 2. Non-existent email
+    $response2 = $this->post(route('login.store'), [
+        'email' => 'doesnotexist@example.com',
+        'password' => 'password123',
+    ]);
+    $response2->assertSessionHasErrors([
+        'email' => __('auth.failed'),
+    ]);
     $this->assertGuest();
 });
 

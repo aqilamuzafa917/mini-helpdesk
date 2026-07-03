@@ -7,6 +7,7 @@ use App\Livewire\Tickets\CommentThread;
 use App\Livewire\Tickets\TicketForm;
 use App\Models\Client;
 use App\Models\Ticket;
+use App\Models\TicketComment;
 use App\Models\User;
 use App\Services\TicketQueryService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -211,4 +212,110 @@ test('admin can CRUD tickets', function () {
         'new_status' => 'resolved',
         'notes' => 'Rebooted database server.',
     ]);
+});
+
+test('internal comments are hidden from client users but visible to admins and engineers', function () {
+    $client = Client::factory()->create(['status' => ClientStatus::Active]);
+    $clientUser = User::factory()->client()->create(['client_id' => $client->id]);
+    $engineer = User::factory()->engineer()->create();
+    $admin = User::factory()->admin()->create();
+
+    $ticket = Ticket::factory()->create(['client_id' => $client->id]);
+
+    // Create 1 public comment and 1 internal comment
+    $publicComment = TicketComment::create([
+        'ticket_id' => $ticket->id,
+        'user_id' => $admin->id,
+        'comment' => 'This is a public comment',
+        'is_internal' => false,
+    ]);
+
+    $internalComment = TicketComment::create([
+        'ticket_id' => $ticket->id,
+        'user_id' => $admin->id,
+        'comment' => 'This is an internal comment',
+        'is_internal' => true,
+    ]);
+
+    // 1. Client user sees only the public comment
+    Livewire::actingAs($clientUser)
+        ->test(CommentThread::class, ['ticket' => $ticket])
+        ->assertViewHas('comments', function ($comments) use ($publicComment, $internalComment) {
+            return $comments->contains($publicComment) && ! $comments->contains($internalComment);
+        });
+
+    // 2. Engineer user sees both comments
+    Livewire::actingAs($engineer)
+        ->test(CommentThread::class, ['ticket' => $ticket])
+        ->assertViewHas('comments', function ($comments) use ($publicComment, $internalComment) {
+            return $comments->contains($publicComment) && $comments->contains($internalComment);
+        });
+
+    // 3. Admin user sees both comments
+    Livewire::actingAs($admin)
+        ->test(CommentThread::class, ['ticket' => $ticket])
+        ->assertViewHas('comments', function ($comments) use ($publicComment, $internalComment) {
+            return $comments->contains($publicComment) && $comments->contains($internalComment);
+        });
+});
+
+test('HTTP layer GET detail view is blocked for unauthorized roles (Property 6)', function () {
+    $clientA = Client::factory()->create(['status' => ClientStatus::Active]);
+    $clientB = Client::factory()->create(['status' => ClientStatus::Active]);
+
+    $clientUserA = User::factory()->client()->create(['client_id' => $clientA->id]);
+    $clientUserB = User::factory()->client()->create(['client_id' => $clientB->id]);
+
+    $engineer1 = User::factory()->engineer()->create();
+    $engineer2 = User::factory()->engineer()->create();
+
+    // Ticket belonging to Client A, assigned to Engineer 1
+    $ticket = Ticket::factory()->create([
+        'client_id' => $clientA->id,
+        'assigned_engineer_id' => $engineer1->id,
+    ]);
+
+    // 1. Client User A can view the ticket
+    $this->actingAs($clientUserA)->get(route('tickets.show', $ticket))->assertOk();
+
+    // 2. Client User B cannot view the ticket (403)
+    $this->actingAs($clientUserB)->get(route('tickets.show', $ticket))->assertForbidden();
+
+    // 3. Engineer 1 can view the ticket
+    $this->actingAs($engineer1)->get(route('tickets.show', $ticket))->assertOk();
+
+    // 4. Engineer 2 cannot view the ticket (403)
+    $this->actingAs($engineer2)->get(route('tickets.show', $ticket))->assertForbidden();
+});
+
+test('policy view check and query scope visibleTo are perfectly consistent (Property 4)', function () {
+    $clientA = Client::factory()->create(['status' => ClientStatus::Active]);
+    $clientB = Client::factory()->create(['status' => ClientStatus::Active]);
+
+    $admin = User::factory()->admin()->create();
+    $engineer = User::factory()->engineer()->create();
+    $clientUser = User::factory()->client()->create(['client_id' => $clientA->id]);
+
+    // Create a pool of tickets
+    $tickets = collect([
+        Ticket::factory()->create(['client_id' => $clientA->id, 'assigned_engineer_id' => $engineer->id]),
+        Ticket::factory()->create(['client_id' => $clientA->id, 'assigned_engineer_id' => null]),
+        Ticket::factory()->create(['client_id' => $clientB->id, 'assigned_engineer_id' => $engineer->id]),
+        Ticket::factory()->create(['client_id' => $clientB->id, 'assigned_engineer_id' => null]),
+    ]);
+
+    $users = [$admin, $engineer, $clientUser];
+
+    foreach ($users as $user) {
+        // Retrieve tickets scoped via scopeVisibleTo query builder
+        $scopedTickets = Ticket::visibleTo($user)->get();
+
+        foreach ($tickets as $ticket) {
+            $isAllowedByPolicy = $user->can('view', $ticket);
+            $isInScopeQuery = $scopedTickets->contains('id', $ticket->id);
+
+            // Assert exact agreement: policy authorization must match query scope inclusion
+            expect($isAllowedByPolicy)->toBe($isInScopeQuery);
+        }
+    }
 });
