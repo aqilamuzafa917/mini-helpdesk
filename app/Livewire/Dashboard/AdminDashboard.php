@@ -2,12 +2,26 @@
 
 namespace App\Livewire\Dashboard;
 
+use App\Services\DashboardMetricsService;
+use Illuminate\View\View;
 use Livewire\Component;
 
 class AdminDashboard extends Component
 {
-    public function render()
+    /**
+     * Render the component view.
+     *
+     * @return View
+     */
+    public function render(DashboardMetricsService $metricsService)
     {
-        return view('livewire.dashboard.admin-dashboard');
+        $user = auth()->user();
+        $metrics = $metricsService->getAdminMetrics($user);
+        $recentTickets = $metricsService->getRecentTickets($user);
+
+        return view('livewire.dashboard.admin-dashboard', [
+            'metrics' => $metrics,
+            'recentTickets' => $recentTickets,
+        ]);
     }
 }
