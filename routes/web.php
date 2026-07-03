@@ -1,6 +1,9 @@
 <?php
 
 use App\Enums\Role;
+use App\Http\Requests\StoreCommentRequest;
+use App\Http\Requests\StoreTicketRequest;
+use App\Http\Requests\UpdateTicketRequest;
 use App\Livewire\Clients\ClientForm;
 use App\Livewire\Clients\ClientTable;
 use App\Livewire\Dashboard\AdminDashboard;
@@ -12,6 +15,7 @@ use App\Livewire\Tickets\TicketForm;
 use App\Livewire\Tickets\TicketTable;
 use App\Livewire\Users\UserForm;
 use App\Livewire\Users\UserTable;
+use App\Models\Ticket;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
@@ -48,6 +52,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tickets/create', TicketForm::class)->name('tickets.create');
     Route::get('/tickets/{ticket}', TicketDetail::class)->name('tickets.show');
     Route::get('/tickets/{ticket}/edit', TicketForm::class)->name('tickets.edit');
+
+    // REST endpoints to test Form Request validation/authorization regardless of UI state
+    Route::post('/tickets', function (StoreTicketRequest $request) {
+        return response()->json(['message' => 'Ticket created']);
+    })->name('tickets.store');
+
+    Route::match(['put', 'patch', 'post'], '/tickets/{ticket}', function (UpdateTicketRequest $request, Ticket $ticket) {
+        return response()->json(['message' => 'Ticket updated']);
+    })->name('tickets.update');
+
+    Route::post('/tickets/{ticket}/comments', function (StoreCommentRequest $request, Ticket $ticket) {
+        return response()->json(['message' => 'Comment created']);
+    })->name('comments.store');
 
     // Reports
     Route::get('/reports/monthly', MonthlyReport::class)->name('reports.monthly');

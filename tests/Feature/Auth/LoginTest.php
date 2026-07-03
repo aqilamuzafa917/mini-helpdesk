@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 
 uses(RefreshDatabase::class);
 
@@ -36,6 +37,39 @@ test('authenticated user redirects to correct dashboard based on role', function
     // 3. Client dashboard redirect
     $response = $this->actingAs($client)->get('/dashboard');
     $response->assertRedirect('/client/dashboard');
+});
+
+test('user logs in and redirects to correct dashboard based on role via POST flow', function () {
+    // 1. Admin Login Redirect
+    $admin = User::factory()->admin()->create(['password' => Hash::make('password123')]);
+    $response = $this->post(route('login.store'), [
+        'email' => $admin->email,
+        'password' => 'password123',
+    ]);
+    $response->assertRedirect('/dashboard');
+
+    // Follow redirect
+    $this->actingAs($admin)->get('/dashboard')->assertRedirect('/admin/dashboard');
+
+    // 2. Engineer Login Redirect
+    $engineer = User::factory()->engineer()->create(['password' => Hash::make('password123')]);
+    $response = $this->post(route('login.store'), [
+        'email' => $engineer->email,
+        'password' => 'password123',
+    ]);
+    $response->assertRedirect('/dashboard');
+
+    $this->actingAs($engineer)->get('/dashboard')->assertRedirect('/engineer/dashboard');
+
+    // 3. Client Login Redirect
+    $client = User::factory()->client()->create(['password' => Hash::make('password123')]);
+    $response = $this->post(route('login.store'), [
+        'email' => $client->email,
+        'password' => 'password123',
+    ]);
+    $response->assertRedirect('/dashboard');
+
+    $this->actingAs($client)->get('/dashboard')->assertRedirect('/client/dashboard');
 });
 
 test('already authenticated user is redirected to dashboard when visiting login', function () {
