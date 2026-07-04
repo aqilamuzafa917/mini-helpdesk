@@ -22,6 +22,4 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
-/.agents
 /.cursor
-/.kiro
