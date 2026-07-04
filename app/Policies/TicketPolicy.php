@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\ClientStatus;
 use App\Enums\Role;
 use App\Models\Ticket;
 use App\Models\User;
@@ -24,7 +25,11 @@ class TicketPolicy
 
     public function create(User $user): bool
     {
-        return $user->role === Role::Admin || $user->role === Role::Client;
+        if ($user->role === Role::Client) {
+            return $user->client && $user->client->status === ClientStatus::Active;
+        }
+
+        return $user->role === Role::Admin;
     }
 
     public function update(User $user, Ticket $ticket): bool

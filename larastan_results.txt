@@ -1,0 +1,284 @@
+ ------ -------------------------------------------------------------------------------------------- 
+  Line   app/Http/Middleware/RoleMiddleware.php                                                      
+ ------ -------------------------------------------------------------------------------------------- 
+  :26    Instanceof between App\Enums\Role and App\Enums\Role will always evaluate to true.          
+         🪪  instanceof.alwaysTrue                                                                   
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatP  
+         hpDocTypesAsCertain: false in your phpstan.neon.                                            
+ ------ -------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------- 
+  Line   app/Http/Requests/StoreCommentRequest.php                                                   
+ ------ -------------------------------------------------------------------------------------------- 
+  :37    Access to an undefined property App\Models\Ticket|Illuminate\Database\Eloquent\Collection<  
+         int, App\Models\Ticket>::$client_id.                                                        
+         🪪  property.notFound                                                                       
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property       
+  :50    Access to an undefined property App\Models\Ticket|Illuminate\Database\Eloquent\Collection<  
+         int, App\Models\Ticket>::$assigned_engineer_id.                                             
+         🪪  property.notFound                                                                       
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property       
+ ------ -------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------- 
+  Line   app/Http/Requests/UpdateTicketRequest.php                                                   
+ ------ -------------------------------------------------------------------------------------------- 
+  :37    Strict comparison using === between App\Enums\Role::Engineer and App\Enums\Role::Engineer   
+         will always evaluate to true.                                                               
+         🪪  identical.alwaysTrue                                                                    
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatP  
+         hpDocTypesAsCertain: false in your phpstan.neon.                                            
+         💡  Use match expression instead. PHPStan will report unhandled enum cases.                 
+  :51    Access to an undefined property App\Models\Ticket|Illuminate\Database\Eloquent\Collection<  
+         int, App\Models\Ticket>::$assigned_engineer_id.                                             
+         🪪  property.notFound                                                                       
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property       
+  :61    Access to an undefined property App\Models\Ticket|Illuminate\Database\Eloquent\Collection<  
+         int, App\Models\Ticket>::$priority.                                                         
+         🪪  property.notFound                                                                       
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property       
+  :61    Cannot access property $value on string.                                                    
+         🪪  property.nonObject                                                                      
+  :68    Unreachable statement - code above always terminates.                                       
+         🪪  deadCode.unreachable                                                                    
+ ------ -------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------ 
+  Line   app/Livewire/Clients/ClientForm.php       
+ ------ ------------------------------------------ 
+  :53    Cannot access property $value on string.  
+         🪪  property.nonObject                    
+ ------ ------------------------------------------ 
+
+ ------ -------------------------------------------------------------------------------------------- 
+  Line   app/Livewire/Clients/ClientTable.php                                                        
+ ------ -------------------------------------------------------------------------------------------- 
+  :51    Strict comparison using === between string and App\Enums\ClientStatus::Active will always   
+         evaluate to false.                                                                          
+         🪪  identical.alwaysFalse                                                                   
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatP  
+         hpDocTypesAsCertain: false in your phpstan.neon.                                            
+ ------ -------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------- 
+  Line   app/Livewire/Reports/MonthlyReport.php                                                      
+ ------ -------------------------------------------------------------------------------------------- 
+  :28    Property App\Livewire\Reports\MonthlyReport::$clients has no type specified.                
+         🪪  missingType.property                                                                    
+  :30    Property App\Livewire\Reports\MonthlyReport::$months has no type specified.                 
+         🪪  missingType.property                                                                    
+  :32    Property App\Livewire\Reports\MonthlyReport::$years has no type specified.                  
+         🪪  missingType.property                                                                    
+  :39    Property App\Livewire\Reports\MonthlyReport::$queryString (array<string, array<string, str  
+         ing>>) does not accept default value of type array<string, array<string, null>>.            
+         🪪  property.defaultValue                                                                   
+  :69    Parameter #2 $timestamp of function date expects int|null, int|false given.                 
+         🪪  argument.type                                                                           
+  :110   Using nullsafe property access "?->remarks" on left side of ?? is unnecessary. Use ->       
+         instead.                                                                                    
+         🪪  nullsafe.neverNull                                                                      
+ ------ -------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------ 
+  Line   app/Livewire/Tickets/TicketDetail.php     
+ ------ ------------------------------------------ 
+  :33    Cannot access property $value on string.  
+         🪪  property.nonObject                    
+  :53    Cannot access property $value on string.  
+         🪪  property.nonObject                    
+ ------ ------------------------------------------ 
+
+ ------ ----------------------------------------------------------------------------- 
+  Line   app/Livewire/Tickets/TicketForm.php                                          
+ ------ ----------------------------------------------------------------------------- 
+  :50    Property App\Livewire\Tickets\TicketForm::$clients has no type specified.    
+         🪪  missingType.property                                                     
+  :52    Property App\Livewire\Tickets\TicketForm::$engineers has no type specified.  
+         🪪  missingType.property                                                     
+  :74    Cannot access property $value on string.                                     
+         🪪  property.nonObject                                                       
+  :75    Cannot access property $value on string.                                     
+         🪪  property.nonObject                                                       
+ ------ ----------------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------------- 
+  Line   app/Livewire/Tickets/TicketTable.php                                        
+ ------ ---------------------------------------------------------------------------- 
+  :41    Property App\Livewire\Tickets\TicketTable::$clients has no type specified.  
+         🪪  missingType.property                                                    
+ ------ ---------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app/Livewire/Users/UserForm.php                                        
+ ------ ----------------------------------------------------------------------- 
+  :48    Property App\Livewire\Users\UserForm::$clients has no type specified.  
+         🪪  missingType.property                                               
+ ------ ----------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------- 
+  Line   app/Models/Client.php                                                                       
+ ------ -------------------------------------------------------------------------------------------- 
+  :12    Class App\Models\Client uses generic trait                                                  
+         Illuminate\Database\Eloquent\Factories\HasFactory but does not specify its types: TFactory  
+         🪪  missingType.generics                                                                    
+  :30    Method App\Models\Client::users() return type with generic class                            
+         Illuminate\Database\Eloquent\Relations\HasMany does not specify its types: TRelatedModel,   
+         TDeclaringModel                                                                             
+         🪪  missingType.generics                                                                    
+  :35    Method App\Models\Client::tickets() return type with generic class                          
+         Illuminate\Database\Eloquent\Relations\HasMany does not specify its types: TRelatedModel,   
+         TDeclaringModel                                                                             
+         🪪  missingType.generics                                                                    
+  :40    Method App\Models\Client::monthlyReportRemarks() return type with generic class             
+         Illuminate\Database\Eloquent\Relations\HasMany does not specify its types: TRelatedModel,   
+         TDeclaringModel                                                                             
+         🪪  missingType.generics                                                                    
+ ------ -------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------- 
+  Line   app/Models/MonthlyReportRemark.php                                                          
+ ------ -------------------------------------------------------------------------------------------- 
+  :11    Class App\Models\MonthlyReportRemark uses generic trait                                     
+         Illuminate\Database\Eloquent\Factories\HasFactory but does not specify its types: TFactory  
+         🪪  missingType.generics                                                                    
+  :21    Method App\Models\MonthlyReportRemark::client() return type with generic class              
+         Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types:                
+         TRelatedModel, TDeclaringModel                                                              
+         🪪  missingType.generics                                                                    
+  :26    Method App\Models\MonthlyReportRemark::creator() return type with generic class             
+         Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types:                
+         TRelatedModel, TDeclaringModel                                                              
+         🪪  missingType.generics                                                                    
+ ------ -------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------- 
+  Line   app/Models/Ticket.php                                                                       
+ ------ -------------------------------------------------------------------------------------------- 
+  :16    Class App\Models\Ticket uses generic trait                                                  
+         Illuminate\Database\Eloquent\Factories\HasFactory but does not specify its types: TFactory  
+         🪪  missingType.generics                                                                    
+  :41    Method App\Models\Ticket::scopeVisibleTo() has parameter $query with generic class          
+         Illuminate\Database\Eloquent\Builder but does not specify its types: TModel                 
+         🪪  missingType.generics                                                                    
+  :41    Method App\Models\Ticket::scopeVisibleTo() return type with generic class                   
+         Illuminate\Database\Eloquent\Builder does not specify its types: TModel                     
+         🪪  missingType.generics                                                                    
+  :50    Method App\Models\Ticket::client() return type with generic class                           
+         Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types:                
+         TRelatedModel, TDeclaringModel                                                              
+         🪪  missingType.generics                                                                    
+  :55    Method App\Models\Ticket::creator() return type with generic class                          
+         Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types:                
+         TRelatedModel, TDeclaringModel                                                              
+         🪪  missingType.generics                                                                    
+  :60    Method App\Models\Ticket::assignedEngineer() return type with generic class                 
+         Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types:                
+         TRelatedModel, TDeclaringModel                                                              
+         🪪  missingType.generics                                                                    
+  :65    Method App\Models\Ticket::comments() return type with generic class                         
+         Illuminate\Database\Eloquent\Relations\HasMany does not specify its types: TRelatedModel,   
+         TDeclaringModel                                                                             
+         🪪  missingType.generics                                                                    
+  :70    Method App\Models\Ticket::statusHistories() return type with generic class                  
+         Illuminate\Database\Eloquent\Relations\HasMany does not specify its types: TRelatedModel,   
+         TDeclaringModel                                                                             
+         🪪  missingType.generics                                                                    
+ ------ -------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------- 
+  Line   app/Models/TicketComment.php                                                                
+ ------ -------------------------------------------------------------------------------------------- 
+  :11    Class App\Models\TicketComment uses generic trait                                           
+         Illuminate\Database\Eloquent\Factories\HasFactory but does not specify its types: TFactory  
+         🪪  missingType.generics                                                                    
+  :27    Method App\Models\TicketComment::ticket() return type with generic class                    
+         Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types:                
+         TRelatedModel, TDeclaringModel                                                              
+         🪪  missingType.generics                                                                    
+  :32    Method App\Models\TicketComment::user() return type with generic class                      
+         Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types:                
+         TRelatedModel, TDeclaringModel                                                              
+         🪪  missingType.generics                                                                    
+ ------ -------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------- 
+  Line   app/Models/TicketStatusHistory.php                                                          
+ ------ -------------------------------------------------------------------------------------------- 
+  :11    Class App\Models\TicketStatusHistory uses generic trait                                     
+         Illuminate\Database\Eloquent\Factories\HasFactory but does not specify its types: TFactory  
+         🪪  missingType.generics                                                                    
+  :31    Method App\Models\TicketStatusHistory::ticket() return type with generic class              
+         Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types:                
+         TRelatedModel, TDeclaringModel                                                              
+         🪪  missingType.generics                                                                    
+  :36    Method App\Models\TicketStatusHistory::changer() return type with generic class             
+         Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types:                
+         TRelatedModel, TDeclaringModel                                                              
+         🪪  missingType.generics                                                                    
+ ------ -------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   app/Models/User.php                                                                        
+ ------ ------------------------------------------------------------------------------------------- 
+  :59    Method App\Models\User::client() return type with generic class                            
+         Illuminate\Database\Eloquent\Relations\BelongsTo does not specify its types:               
+         TRelatedModel, TDeclaringModel                                                             
+         🪪  missingType.generics                                                                   
+  :64    Method App\Models\User::createdTickets() return type with generic class                    
+         Illuminate\Database\Eloquent\Relations\HasMany does not specify its types: TRelatedModel,  
+         TDeclaringModel                                                                            
+         🪪  missingType.generics                                                                   
+  :69    Method App\Models\User::assignedTickets() return type with generic class                   
+         Illuminate\Database\Eloquent\Relations\HasMany does not specify its types: TRelatedModel,  
+         TDeclaringModel                                                                            
+         🪪  missingType.generics                                                                   
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------ 
+  Line   app/Observers/TicketObserver.php          
+ ------ ------------------------------------------ 
+  :42    Cannot access property $value on string.  
+         🪪  property.nonObject                    
+ ------ ------------------------------------------ 
+
+ ------ ------------------------------------------------------------------------------------------ 
+  Line   app/Services/DashboardMetricsService.php                                                  
+ ------ ------------------------------------------------------------------------------------------ 
+  :26    Method App\Services\DashboardMetricsService::getStatusCountsForQuery() has parameter      
+         $query with generic class Illuminate\Database\Eloquent\Builder but does not specify its   
+         types: TModel                                                                             
+         🪪  missingType.generics                                                                  
+  :102   Method App\Services\DashboardMetricsService::getRecentTickets() return type with generic  
+         class Illuminate\Support\Collection does not specify its types: TKey, TValue              
+         🪪  missingType.generics                                                                  
+ ------ ------------------------------------------------------------------------------------------ 
+
+ ------ -------------------------------------------------------------------------------------------- 
+  Line   app/Services/MonthlyReportService.php                                                       
+ ------ -------------------------------------------------------------------------------------------- 
+  :26    Method App\Services\MonthlyReportService::getStatusCountsForQuery() has parameter $query    
+         with generic class Illuminate\Database\Eloquent\Builder but does not specify its types:     
+         TModel                                                                                      
+         🪪  missingType.generics                                                                    
+  :47    Method App\Services\MonthlyReportService::getPriorityCountsForQuery() has parameter $query  
+         with generic class Illuminate\Database\Eloquent\Builder but does not specify its types:     
+         TModel                                                                                      
+         🪪  missingType.generics                                                                    
+  :76    Method App\Services\MonthlyReportService::generateReport() return type with generic class   
+         Illuminate\Support\Collection does not specify its types: TKey, TValue                      
+         🪪  missingType.generics                                                                    
+ ------ -------------------------------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------------------------- 
+  Line   app/Services/TicketQueryService.php                                                     
+ ------ ---------------------------------------------------------------------------------------- 
+  :14    Method App\Services\TicketQueryService::scopedQuery() return type with generic class    
+         Illuminate\Database\Eloquent\Builder does not specify its types: TModel                 
+         🪪  missingType.generics                                                                
+  :24    Method App\Services\TicketQueryService::filteredQuery() return type with generic class  
+         Illuminate\Database\Eloquent\Builder does not specify its types: TModel                 
+         🪪  missingType.generics                                                                
+ ------ ---------------------------------------------------------------------------------------- 
+
+ [ERROR] Found 56 errors                                                                             
+

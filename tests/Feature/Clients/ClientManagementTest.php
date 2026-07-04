@@ -4,6 +4,7 @@ use App\Enums\ClientStatus;
 use App\Livewire\Clients\ClientForm;
 use App\Livewire\Clients\ClientTable;
 use App\Models\Client;
+use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -140,4 +141,24 @@ test('admin can update client and reuse existing email', function () {
         'name' => 'Updated Name',
         'email' => 'keep@client.com',
     ]);
+});
+
+test('deactivated client users cannot log in and cannot create tickets', function () {
+    $client = Client::factory()->create(['status' => ClientStatus::Inactive]);
+    $user = User::factory()->client()->create([
+        'client_id' => $client->id,
+        'email' => 'client@abc.com',
+        'password' => 'password123',
+    ]);
+
+    // 1. Attempt login with inactive client: should fail
+    $response = $this->post(route('login'), [
+        'email' => 'client@abc.com',
+        'password' => 'password123',
+    ]);
+    $response->assertSessionHasErrors();
+    $this->assertFalse(auth()->check());
+
+    // 2. Authorize Ticket creation: should fail for inactive client user
+    $this->assertFalse($user->can('create', Ticket::class));
 });

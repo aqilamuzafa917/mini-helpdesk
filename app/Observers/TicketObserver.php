@@ -7,6 +7,7 @@ use App\Models\Ticket;
 use App\Models\TicketStatusHistory;
 use App\Services\TicketNumberService;
 use Exception;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class TicketObserver
@@ -64,7 +65,7 @@ class TicketObserver
 
         // Manage resolved_at
         if ($newStatus === TicketStatus::Resolved) {
-            $ticket->resolved_at = now();
+            $ticket->resolved_at = Carbon::instance(now());
         } elseif ($oldStatus === TicketStatus::Resolved) {
             $ticket->resolved_at = null;
         }

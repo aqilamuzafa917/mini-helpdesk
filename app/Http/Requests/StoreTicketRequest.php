@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ClientStatus;
 use App\Enums\Priority;
 use App\Enums\Role;
 use App\Enums\TicketStatus;
@@ -18,8 +19,15 @@ class StoreTicketRequest extends FormRequest
     public function authorize(): bool
     {
         $user = auth()->user();
+        if (! $user) {
+            return false;
+        }
 
-        return $user && ($user->role === Role::Admin || $user->role === Role::Client);
+        if ($user->role === Role::Client) {
+            return $user->client && $user->client->status === ClientStatus::Active;
+        }
+
+        return $user->role === Role::Admin;
     }
 
     /**
@@ -38,7 +46,9 @@ class StoreTicketRequest extends FormRequest
             'status' => ['nullable', new Enum(TicketStatus::class)],
             'client_id' => [
                 $user && $user->role === Role::Admin ? 'required' : 'nullable',
-                $user && $user->role === Role::Admin ? 'exists:clients,id' : 'in:'.$user?->client_id,
+                $user && $user->role === Role::Admin
+                    ? Rule::exists('clients', 'id')->where('status', ClientStatus::Active->value)
+                    : 'in:'.$user?->client_id,
             ],
             'assigned_engineer_id' => [
                 $user && $user->role === Role::Admin ? 'nullable' : 'prohibited',
