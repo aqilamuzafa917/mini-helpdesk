@@ -4,7 +4,22 @@ The **Mini Helpdesk Portal** is a web-based IT support ticket management applica
 
 ---
 
+## Features
+
+- **✓ Authentication**: Gated login access and session management scaffolded with Laravel Fortify.
+- **✓ Role-Based Access**: Scoped views and action restriction using Laravel Policies and Eloquent scopes.
+- **✓ Client Management**: Admin CRUD interface to register and activate/deactivate client companies.
+- **✓ User Management**: Admin CRUD interface to register portal users with role assignments and password hashing.
+- **✓ Ticket Management**: Scoped ticket dashboard, status transitions, priority levels, and assignment controls.
+- **✓ Ticket Comments**: Collaborative comment feeds supporting both public messages and staff-only internal notes.
+- **✓ Dashboard**: Live dashboards displaying metrics and status distribution charts dynamically calculated per role.
+- **✓ Monthly Report**: Activity reports per client including printable layouts and Admin executive summary remarks.
+- **✓ Status History**: Automated audit trail logging for all ticket status transitions.
+
+---
+
 ## Technical Stack
+
 - **Framework**: Laravel 13
 - **Frontend Interactivity**: Livewire 4 & Flux UI
 - **Styling**: Tailwind CSS v4
@@ -49,6 +64,126 @@ The **Mini Helpdesk Portal** is a web-based IT support ticket management applica
 ![Edit Ticket](screenshots/edit-ticket.png)
 
 </details>
+
+
+---
+
+## Installation & Setup
+
+Follow these steps to run the application locally:
+
+### 1. Prerequisites
+Ensure you have the following installed on your system:
+- **PHP 8.5** or higher (with extensions: `mbstring`, `xml`, `sqlite3`, `curl`)
+- **Composer**
+- **Node.js** & **NPM**
+
+### 2. Clone and Install Dependencies
+```bash
+# Clone the repository
+git clone https://github.com/aqilamuzafa/mini-helpdesk.git
+cd mini-helpdesk
+
+# Install PHP dependencies
+composer install
+
+# Install Front-End assets
+npm install
+```
+
+### 3. Environment Configuration
+Copy the template `.env` file and generate the application key:
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+*By default, the `.env` uses an SQLite database. If SQLite is preferred, create the database file:*
+```bash
+touch database/database.sqlite
+```
+
+### 4. Run Migrations & Seeders
+Populate the database with structure and realistic demo data (at least 10+ tickets across multiple clients and statuses):
+```bash
+php artisan migrate --seed
+```
+
+### 5. Running the Application
+Launch the local development environment:
+
+```bash
+composer run dev
+```
+Open your browser and navigate to the application URL (typically `http://localhost:8000`).
+
+---
+
+## Seeded Demo Credentials
+
+Use the following seeded credentials to log in:
+
+- **Admin User**:
+  - **Email**: `admin@example.com`
+  - **Password**: `password123`
+- **Engineer User**:
+  - **Email**: `engineer1@example.com`
+  - **Password**: `password123`
+- **Client User**:
+  - **Email**: `client1@example.com`
+  - **Password**: `password123`
+
+---
+
+## Testing
+
+- **Pest PHP v4** testing suite.
+- **89 Feature & Unit Tests** with **375 Assertions** asserting complete code coverage and RBAC safety.
+- Run the tests using:
+```bash
+php artisan test --compact
+```
+
+---
+
+## Architecture & Design Decisions
+
+### Architecture Diagram
+```mermaid
+graph TD
+    Browser[Browser / Client-Side] --> Livewire[Livewire Components]
+    Livewire --> Policies[Policies / Authorization]
+    Livewire --> Services[Services / Business Logic]
+    Services --> Models[Eloquent Models]
+    Policies --> Models
+    Models --> Database[(Database)]
+```
+
+### Design Decisions
+
+- **Why Observer?**
+  Automatically generates sequential ticket numbers and writes status history to the audit log on update, avoiding duplication of side-effect logic across different components/controllers.
+- **Why Policies?**
+  Encapsulates individual resource-level authorization checks (e.g. view, update) mapping directly to Laravel's gate system.
+- **Why `scopeVisibleTo()`?**
+  Centralizes role-based ticket visibility constraints in one place so that lists, dropdowns, and dashboards all query the exact same scoped dataset.
+- **Why Services?**
+  Keeps business logic (ticket number sequence logic, monthly report generation, dashboard aggregates) clean, decoupled, and easily testable outside of Livewire classes.
+
+### Technical Implementation Highlights
+- **Sequential Ticket Numbers**: Uses database transactions with pessimistic locking (`lockForUpdate`) to safely generate sequential ticket numbers under concurrent requests.
+- **Automatic Status Audits**: Automatically logs status transitions and timestamps to the `ticket_status_histories` table whenever a ticket changes status.
+- **Live Aggregates**: Dashboards display metrics calculated directly from database queries with no hardcoded values.
+- **Print-Optimized Monthly Reports**: Monthly reports contain a gated, print-ready view stripped of sidebars and navigation menus.
+- **Soft Status Toggles**: Clients and users are deactivated via state flags (`status` and `is_active`) rather than database deletion to preserve historical relationship integrity.
+
+### Role-Based Access Control (RBAC)
+
+The portal implements strict role-based access control (Admin, Engineer, and Client) mapped via Laravel policies, route middleware, and query scopes:
+
+- **Admin (`admin`)**: Full CRUD access. Can manage clients/users, view all tickets, assign engineers, change priorities, and submit internal comments.
+- **Engineer (`engineer`)**: View assigned tickets, edit ticket status, and add comments (public & internal). Cannot access client/user management.
+- **Client User (`client`)**: View own tickets, create tickets, add public comments, and view own monthly reports. Cannot update status, priority, or access admin sections.
 
 ---
 
@@ -145,182 +280,6 @@ erDiagram
 
 ---
 
-## Database Migrations & Schema
-
-The application database schema is initialized using Laravel migrations. It contains the following core tables:
-
-1.  **`clients`**: Stores companies using the support portal. Status can be `Active` or `Inactive`.
-2.  **`users`**: Stores user accounts. Users have roles (`Admin`, `Engineer`, `Client`) and can be deactivated. Client-role users are linked to a client via `client_id`.
-3.  **`tickets`**: Tracks support requests. Supports automated sequential ticket numbering (e.g., `TCK-202607-0001` generated safely inside database transactions via locks).
-4.  **`ticket_comments`**: Holds ticket conversation threads. Supports internal comments (`is_internal = true`) which are hidden from clients.
-5.  **`ticket_status_histories`**: Automatically logs an audit trail of ticket status transitions, tracking who changed the status, when, and any accompanying transition notes.
-6.  **`monthly_report_remarks`**: Stores executive summary reviews written by Admins for monthly client reports.
-
----
-
-## Installation & Setup
-
-Follow these steps to run the application locally:
-
-### 1. Prerequisites
-Ensure you have the following installed on your system:
-- **PHP 8.5** or higher (with extensions: `mbstring`, `xml`, `sqlite3`, `curl`)
-- **Composer**
-- **Node.js** & **NPM**
-
-### 2. Clone and Install Dependencies
-```bash
-# Clone the repository
-git clone https://github.com/aqilamuzafa/mini-helpdesk.git
-cd mini-helpdesk
-
-# Install PHP dependencies
-composer install
-
-# Install Front-End assets
-npm install
-```
-
-### 3. Environment Configuration
-Copy the template `.env` file and generate the application key:
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-*By default, the `.env` uses an SQLite database. If SQLite is preferred, create the database file:*
-```bash
-touch database/database.sqlite
-```
-
-### 4. Run Migrations & Seeders
-Populate the database with structure and realistic demo data (at least 10+ tickets across multiple clients and statuses):
-```bash
-php artisan migrate --seed
-```
-
-### 5. Running the Application
-Launch the local development environment:
-
-```bash
-composer run dev
-```
-Open your browser and navigate to the application URL (typically `http://localhost:8000`).
-
----
-
-## Seeded Demo Credentials
-
-Use the following seeded credentials to log in:
-
-- **Admin User**:
-  - **Email**: `admin@example.com`
-  - **Password**: `password123`
-- **Engineer User**:
-  - **Email**: `engineer1@example.com`
-  - **Password**: `password123`
-- **Client User**:
-  - **Email**: `client1@example.com`
-  - **Password**: `password123`
-
----
-
-## Running Tests
-
-Verify application stability and test suite status:
-```bash
-# Run Pest test suite
-php artisan test --compact
-```
-
----
-
-## Role-Based Access Control (RBAC)
-
-The portal implements strict role-based access control (Admin, Engineer, and Client) mapped via Laravel policies, route middleware, and query scopes:
-
-### Roles & Scoped Capabilities
-
-| Role | Target Entities | Permitted Actions | Scoping / Limitations |
-| :--- | :--- | :--- | :--- |
-| **Admin** (`admin`) | Clients, Users, Tickets, Reports, Comments | Full CRUD access to all models. Can assign engineers, change priorities, submit internal comments, and enter executive remarks for client reports. | No scoping limits; has visibility over the entire dataset. |
-| **Engineer** (`engineer`) | Tickets, Comments | View assigned tickets, edit status, add comments (both public and internal). | Scoped strictly to tickets where `assigned_engineer_id` is their own ID. Cannot access client/user management or edit ticket metadata (priority, client, assignment). |
-| **Client User** (`client`) | Tickets, Comments, Reports | View own tickets, create tickets, add comments (public only). View own client's monthly report. | Scoped strictly to their associated `client_id`. Cannot access client/user management, update status/priority, assign engineers, or read/post internal comments. |
-
-### Technical Enforcement
-
-1. **Eloquent Query Scope (`scopeVisibleTo`)**:
-   Centralizes data visibility constraints on the `Ticket` model to ensure that queries automatically restrict lists and dashboard widgets based on the active session's user role:
-   ```php
-   public function scopeVisibleTo(Builder $query, User $user): Builder
-   {
-       return match ($user->role) {
-           Role::Admin    => $query,
-           Role::Engineer => $query->where('assigned_engineer_id', $user->id),
-           Role::Client   => $query->where('client_id', $user->client_id),
-       };
-   }
-   ```
-2. **Laravel Policies**:
-   Enforces identical logic at the individual record/action level (e.g. `TicketPolicy::view`, `TicketPolicy::update`, `TicketCommentPolicy::create`). This guarantees that single-record queries and action authorizations are always consistent with list-level query scopes.
-3. **HTTP / Request Validation Gating**:
-   Input restrictions (like blocking client users from updating ticket status or blocking engineers from changing priorities) are validated at the HTTP layer using custom form requests (`StoreTicketRequest`, `UpdateTicketRequest`). Unpermitted operations return `403 Forbidden` responses.
-4. **Inactive User Gating**:
-   If a client user or engineer's active status (`is_active`) is set to `false`, they are denied login access with a generic credential error to prevent account discovery.
-
----
-
-## Folder Structure
-
-The project follows a standard Laravel directory layout. Below are the key directories containing the custom business logic of this helpdesk:
-
-```
-mini-helpdesk/
-├── app/
-│   ├── Enums/                     # Backed PHP enums (Role, TicketStatus, Priority, ClientStatus)
-│   ├── Http/
-│   │   ├── Middleware/            # RoleMiddleware for route-level grouping
-│   │   └── Requests/              # Form Requests for validation and authorization (StoreClientRequest, StoreUserRequest, etc.)
-│   ├── Livewire/                  # Reactive frontend views
-│   │   ├── Clients/               # Client list table and create/edit forms
-│   │   ├── Dashboard/             # Role-specific dashboard views
-│   │   ├── Reports/               # Monthly reports logic and print views
-│   │   ├── Tickets/               # Ticket list table, forms, comments, and details view
-│   │   └── Users/                 # User management table and forms
-│   ├── Observers/                 # TicketObserver (automates sequential number generation, resolved_at timestamps, audit logs)
-│   ├── Policies/                  # Scoped authorization logic (TicketPolicy, ClientPolicy, etc.)
-│   ├── Providers/                 # TicketObserverServiceProvider registration
-│   └── Services/                  # Core services (TicketQueryService, TicketNumberService, DashboardMetricsService, MonthlyReportService)
-├── database/
-│   ├── migrations/                # Database schema structure migrations
-│   └── seeders/                   # Database seeder producing realistic helpdesk datasets
-├── resources/
-│   ├── css/                       # CSS styles including Tailwind CSS v4 and Flux UI configurations
-│   └── views/                     # Custom Blade views (e.g., reports print layout, layout templates)
-└── tests/
-    ├── Feature/                   # Role and module feature tests (using Pest v4)
-    └── Unit/                      # Isolated service logic and observer tests
-```
-
----
-
-## Technical Features & Implementation Highlights
-
-- **Safe Sequential Ticket Numbers**: Tickets are assigned unique sequential codes (e.g., `TKT-00001`) via a pessimistic lock (`lockForUpdate`) on the database within a transaction, completely eliminating race conditions.
-- **Audit Trails**: Every status change generates an entry in the `ticket_status_histories` table, logging the original status, new status, transition timestamp, and the user who executed the update.
-- **Doughnut Charts**: Live dashboards render Chart.js doughnut graphs dynamically reflecting ticket status distributions for the logged-in user or client.
-- **Print Layout**: Monthly reports include a clean print-ready layout (gated at `/reports/monthly/print`) stripped of navigation menus and sidebar elements.
-- **No Hard-Deletes**: Client entities and tickets are never deleted; instead, clients use `status` states (`Active` or `Inactive`) and users are toggled via `is_active` to safeguard audit integrity.
-
----
-
-## Future Scope / Limitations
-
-- **Email Notifications**: Currently, there are no live email notifications. Integrating queues and notification dispatchers for status updates and comments would be a valuable expansion.
-- **File Attachments**: Tickets are restricted to textual descriptions. Supporting image or document uploads in ticket creation and comments would improve triage capabilities.
-- **SLA Tracking**: Implementing automated Service Level Agreement (SLA) timers with visual warnings when a ticket sits in `Open` or `InProgress` for too long.
-
----
 
 ## AI Usage Log
 
@@ -341,3 +300,11 @@ mini-helpdesk/
 | **Dashboard** | Antigravity | Implement dashboard metrics and role-specific dashboards. | Dashboard components and database queries. | Reviewed metric calculations, verified aggregation queries, and compared results against seeded data. |
 | **Monthly Report** | Antigravity | Implement monthly report generation and print view. | Monthly report service, Livewire component, print view, and tests. | • Reviewed report calculations, filtering logic, and validated printed output.<br>• Added report generation timestamp.<br>• Added ticket resolved date. |
 | **Final Testing & Documentation** | ChatGPT | Generate README structure and documentation template. | README draft and documentation structure. | Completed installation guide, architecture explanation, AI Usage Log, and verified the project using a clean installation and seeded database. |
+
+---
+
+## Future Improvements
+
+- **File Attachments**: Support uploading images or documents to tickets and comment threads.
+- **Email Notifications**: Dispatch notifications via queues on ticket creation, status changes, and new comments.
+- **SLA Tracking**: Implement Service Level Agreement (SLA) timers with alert indicators for unresolved tickets.
