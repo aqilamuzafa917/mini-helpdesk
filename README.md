@@ -6,15 +6,15 @@ The **Mini Helpdesk Portal** is a web-based IT support ticket management applica
 
 ## Features
 
-- **✓ Authentication**: Gated login access and session management scaffolded with Laravel Fortify.
-- **✓ Role-Based Access**: Scoped views and action restriction using Laravel Policies and Eloquent scopes.
-- **✓ Client Management**: Admin CRUD interface to register and activate/deactivate client companies.
-- **✓ User Management**: Admin CRUD interface to register portal users with role assignments and password hashing.
-- **✓ Ticket Management**: Scoped ticket dashboard, status transitions, priority levels, and assignment controls.
-- **✓ Ticket Comments**: Collaborative comment feeds supporting both public messages and staff-only internal notes.
-- **✓ Dashboard**: Live dashboards displaying metrics and status distribution charts dynamically calculated per role.
-- **✓ Monthly Report**: Activity reports per client including printable layouts and Admin executive summary remarks.
-- **✓ Status History**: Automated audit trail logging for all ticket status transitions.
+- **Authentication**: Gated login access and session management scaffolded with Laravel Fortify.
+- **Role-Based Access**: Scoped views and action restriction using Laravel Policies and Eloquent scopes.
+- **Client Management**: Admin CRUD interface to register and activate/deactivate client companies.
+- **User Management**: Admin CRUD interface to register portal users with role assignments and password hashing.
+- **Ticket Management**: Scoped ticket dashboard, status transitions, priority levels, and assignment controls.
+- **Ticket Comments**: Collaborative comment feeds supporting both public messages and staff-only internal notes.
+- **Dashboard**: Live dashboards displaying metrics and status distribution charts dynamically calculated per role.
+- **Monthly Report**: Activity reports per client including printable layouts and Admin executive summary remarks.
+- **Status History**: Automated audit trail logging for all ticket status transitions.
 
 ---
 
