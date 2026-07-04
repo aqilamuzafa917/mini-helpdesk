@@ -117,6 +117,49 @@ composer run dev
 ```
 Open your browser and navigate to the application URL (typically `http://localhost:8000`).
 
+### Alternative: Running with Docker (docker-compose)
+
+If you prefer to run the application in isolated Docker containers, we have pre-configured `docker-compose.yml` and `docker/` setups:
+
+1.  Make sure **Docker Desktop** is installed and running.
+2.  Copy `.env.example` to `.env` and configure the database settings to use MySQL:
+    ```env
+    DB_CONNECTION=mysql
+    DB_HOST=mysql
+    DB_PORT=3306
+    DB_DATABASE=mini_helpdesk
+    DB_USERNAME=root
+    DB_PASSWORD=root
+    ```
+3.  Build and start the containers in the background:
+    ```bash
+    docker-compose up -d --build
+    ```
+4.  Install dependencies, generate key, and seed the database inside the containers:
+    ```bash
+    # Install PHP dependencies
+    docker-compose exec app composer install
+
+    # Generate app encryption key
+    docker-compose exec app php artisan key:generate
+
+    # Run database migrations and seed realistic demo data
+    docker-compose exec app php artisan migrate --seed
+    ```
+5.  Build assets (or keep Vite watcher running):
+    ```bash
+    # Run once
+    npm install && npm run build
+    ```
+6.  Access the services:
+    - **Web Application**: Navigate to `http://localhost:8080` (routed via Alpine Nginx container).
+    - **Mailpit (Local Mail Inbox)**: Navigate to `http://localhost:8025` to inspect outbound emails.
+
+To stop the containers, run:
+```bash
+docker-compose down
+```
+
 ---
 
 ## Seeded Demo Credentials
