@@ -5,6 +5,7 @@ namespace App\Livewire\Tickets;
 use App\Http\Requests\UpdateTicketRequest;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -61,7 +62,7 @@ class TicketDetail extends Component
             abort(403, 'Forbidden');
         }
 
-        $this->validate($request->rules());
+        Validator::make($payload, $request->rules())->validate();
 
         // Set status change notes directly on model for TicketObserver logging
         $this->ticket->status_change_notes = $this->status_change_notes ?: null;
