@@ -194,18 +194,14 @@ php artisan test --compact
 ### Architecture Diagram
 
 ```mermaid
+
 graph TD
     subgraph RequestPipeline["Request Pipeline"]
         Browser["Browser"] --> Router["routes/web.php"]
-        Router --> AuthMiddleware["auth Middleware (Fortify)"]
+        Router --> AuthMiddleware["auth Middleware (Laravel Fortify)"]
         AuthMiddleware --> RoleMiddleware["role Middleware"]
     end
 
-    subgraph Auth["Authentication (Laravel Fortify)"]
-        Password["Password Login"]
-        TwoFactor["Two-Factor Auth (TOTP)"]
-        Passkeys["Passkeys (WebAuthn)"]
-    end
 
     subgraph LivewireLayer["Livewire Components"]
         Dashboard["Dashboard\n(Admin / Engineer / Client)"]
@@ -226,7 +222,6 @@ graph TD
         DB[("Database")]
     end
 
-    AuthMiddleware --> Auth
     RoleMiddleware --> LivewireLayer
 
     LivewireLayer --> Policies
