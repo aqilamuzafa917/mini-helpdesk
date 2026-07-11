@@ -192,14 +192,58 @@ php artisan test --compact
 ## Architecture & Design Decisions
 
 ### Architecture Diagram
+
 ```mermaid
 graph TD
-    Browser[Browser / Client-Side] --> Livewire[Livewire Components]
-    Livewire --> Policies[Policies / Authorization]
-    Livewire --> Services[Services / Business Logic]
-    Services --> Models[Eloquent Models]
+    subgraph Infrastructure["Docker Infrastructure"]
+        Nginx["Nginx (reverse proxy)"]
+        App["Laravel App (PHP-FPM)"]
+        DB[("MySQL / SQLite")]
+        Mail["Mailpit (SMTP)"]
+    end
+
+    subgraph RequestPipeline["Request Pipeline"]
+        Browser["Browser"] --> Nginx
+        Nginx --> Router["routes/web.php"]
+        Router --> AuthMiddleware["auth Middleware (Fortify)"]
+        AuthMiddleware --> RoleMiddleware["role Middleware"]
+    end
+
+    subgraph Auth["Authentication (Laravel Fortify)"]
+        Password["Password Login"]
+        TwoFactor["Two-Factor Auth (TOTP)"]
+        Passkeys["Passkeys (WebAuthn)"]
+    end
+
+    subgraph LivewireLayer["Livewire Components"]
+        Dashboard["Dashboard\n(Admin / Engineer / Client)"]
+        Tickets["Tickets\n(Table, Form, Detail, Comments)"]
+        Clients["Clients\n(Table, Form)"]
+        Users["Users\n(Table, Form)"]
+        Reports["Monthly Report"]
+    end
+
+    subgraph BusinessLogic["Business Logic"]
+        Policies["Policies\n(authorization per resource)"]
+        Services["Services\n(metrics, reports, query, numbering)"]
+        Observer["TicketObserver\n(auto-number, status audit)"]
+    end
+
+    subgraph DataLayer["Data Layer"]
+        Models["Eloquent Models\n(User, Client, Ticket,\nTicketComment, TicketStatusHistory,\nMonthlyReportRemark)"]
+    end
+
+    AuthMiddleware --> Auth
+    RoleMiddleware --> LivewireLayer
+    App --> Router
+
+    LivewireLayer --> Policies
+    LivewireLayer --> Services
+    Services --> Models
     Policies --> Models
-    Models --> Database[(Database)]
+    Observer --> Models
+    Models --> DB
+    App --> Mail
 ```
 
 ### Design Decisions
