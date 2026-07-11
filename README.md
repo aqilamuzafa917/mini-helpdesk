@@ -195,16 +195,8 @@ php artisan test --compact
 
 ```mermaid
 graph TD
-    subgraph Infrastructure["Docker Infrastructure"]
-        Nginx["Nginx (reverse proxy)"]
-        App["Laravel App (PHP-FPM)"]
-        DB[("MySQL / SQLite")]
-        Mail["Mailpit (SMTP)"]
-    end
-
     subgraph RequestPipeline["Request Pipeline"]
-        Browser["Browser"] --> Nginx
-        Nginx --> Router["routes/web.php"]
+        Browser["Browser"] --> Router["routes/web.php"]
         Router --> AuthMiddleware["auth Middleware (Fortify)"]
         AuthMiddleware --> RoleMiddleware["role Middleware"]
     end
@@ -231,11 +223,11 @@ graph TD
 
     subgraph DataLayer["Data Layer"]
         Models["Eloquent Models\n(User, Client, Ticket,\nTicketComment, TicketStatusHistory,\nMonthlyReportRemark)"]
+        DB[("Database")]
     end
 
     AuthMiddleware --> Auth
     RoleMiddleware --> LivewireLayer
-    App --> Router
 
     LivewireLayer --> Policies
     LivewireLayer --> Services
@@ -243,7 +235,6 @@ graph TD
     Policies --> Models
     Observer --> Models
     Models --> DB
-    App --> Mail
 ```
 
 ### Design Decisions
