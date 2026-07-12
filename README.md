@@ -194,7 +194,6 @@ php artisan test --compact
 ### Architecture Diagram
 
 ```mermaid
-
 graph TD
     subgraph RequestPipeline["Request Pipeline"]
         Browser["Browser"] --> Router["routes/web.php"]
@@ -228,7 +227,7 @@ graph TD
     LivewireLayer --> Services
     Services --> Models
     Policies --> Models
-    Observer --> Models
+    Observer <--> Models
     Models --> DB
 ```
 
